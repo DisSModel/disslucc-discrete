@@ -1,0 +1,30 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "disslucc-discrete"
+version = "0.1.0"
+description = "Discrete spatial LUCC models for DisSModel — CLUE-S allocation with logistic regression potential"
+readme = "README.md"
+authors = [{ name = "Your Name", email = "your.email@ufma.br" }]
+license = { text = "MIT" }
+dependencies = [
+    "dissmodel @ git+https://github.com/LambdaGeo/dissmodel.git@develop",
+    "pandas>=1.5.0",
+    "numpy>=1.23.0",
+    "geopandas>=0.12.0",
+    "rasterio>=1.3.0",
+    "mapclassify>=2.4.0",
+]
+requires-python = ">=3.9"
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.0.0",
+    "black>=22.0.0",
+    "ruff>=0.0.200",
+]
+
+[project.entry-points."dissmodel.executors"]
+clue_s_vector = "disslucc.executors.clue_s_vector_executor:ClueSVectorExecutor"

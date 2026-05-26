@@ -1,0 +1,52 @@
+[model]
+land_use_types = ["f", "d", "o"]
+region_attr    = "region"
+cell_area      = 1.0
+
+# ── Potential ─────────────────────────────────────────────────────────────────
+
+[[model.potential]]
+# f
+const      = -2.34187976925989
+elasticity = 0.0
+[model.potential.betas]
+media_decl = -0.0272710076327129
+dist_area_ = 4.30977432375496
+dist_br    = 3.10319957497883
+dist_curua = 0.445414024051873
+dist_rios_ = 47.3556329553235
+dist_estra = 38.4966894254506
+
+[[model.potential]]
+# d
+const      = -0.100351497277102
+elasticity = 0.6
+[model.potential.betas]
+media_decl = 0.0581358851690861
+dist_area_ = -0.974998890251365
+dist_br    = -2.51650696123426
+dist_curua = -1.26742746441679
+dist_rios_ = -40.3646901047482
+dist_estra = -23.0841140199094
+
+[[model.potential]]
+# o
+const      = 0.01
+elasticity = 0.5
+[model.potential.betas]
+
+# ── Allocation ────────────────────────────────────────────────────────────────
+
+[model.allocation]
+max_difference   = 10.0
+max_iteration    = 1000
+factor_iteration = 0.0001
+
+[model.transition_matrix]
+data = [
+    [
+        [1, 1, 0],
+        [0, 1, 0],
+        [0, 0, 1]
+    ]
+]
