@@ -211,7 +211,7 @@ class ClueSVectorExecutor(ModelExecutor):
             params.get("cell_area") or spec.get("cell_area", 1.0)
         )
         # ── environment + modelos ─────────────────────────────────────────
-        env = Environment(end_time=n_steps - 1)
+        env = Environment(end_time=n_steps)
 
         demand = DemandPreComputedValues(
             annual_demand  = annual_demand,
@@ -258,7 +258,6 @@ class ClueSVectorExecutor(ModelExecutor):
                 plot_params = {
                     "column": lu_types[0],
                     "cmap":   "YlGn",
-                    "scheme": "categorical",
                     "legend": True,
                 },
             )
@@ -268,6 +267,11 @@ class ClueSVectorExecutor(ModelExecutor):
             f"{n_steps} passos · {len(gdf)} células · {len(lu_types)} usos"
         )
         env.run()
+
+        if params.get("interactive", False):
+            import matplotlib.pyplot as plt
+            plt.show()
+
         record.add_log("Simulação concluída.")
         return gdf
 
