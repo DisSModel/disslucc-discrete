@@ -28,3 +28,13 @@ dev = [
 
 [project.entry-points."dissmodel.executors"]
 clue_s_vector = "disslucc_discrete.executors.clue_s_vector_executor:ClueSVectorExecutor"
+
+[tool.black]
+line-length = 88
+target-version = ['py39']
+
+[tool.ruff]
+line-length = 88
+target-version = "py39"
+select = ["E", "F", "I"] # pycodestyle, pyflakes, isort
+ignore = ["E701", "E241", "E203"] # allow some common spacing styles for math

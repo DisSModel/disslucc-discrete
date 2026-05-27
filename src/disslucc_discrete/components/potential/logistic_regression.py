@@ -4,13 +4,14 @@ disslucc_discrete.components.potential.logistic_regression
 Potencial por regressão logística — CLUE-S discreto.
 Tradução de PotentialDLogisticRegression.lua (LuccME / TerraME).
 """
+
 # fixed: updated import to disslucc_discrete.schemas.schemas
 from __future__ import annotations
 
 import numpy as np
+from dissmodel.geo import SyncSpatialModel
 
 from disslucc_discrete.schemas.schemas import LogisticRegressionSpec
-from dissmodel.geo import SyncSpatialModel
 
 
 class PotentialDLogisticRegression(SyncSpatialModel):
@@ -47,11 +48,11 @@ class PotentialDLogisticRegression(SyncSpatialModel):
         self,
         potential_data: list[list[LogisticRegressionSpec]],
         land_use_types: list[str],
-        region_attr:    str = "region",
+        region_attr: str = "region",
     ) -> None:
         self.potential_data = potential_data
         self.land_use_types = land_use_types
-        self.region_attr    = region_attr
+        self.region_attr = region_attr
 
         # Garante coluna de região — equivale ao cell.region = 1 do Lua
         if self.region_attr not in self.gdf.columns:
@@ -76,9 +77,9 @@ class PotentialDLogisticRegression(SyncSpatialModel):
 
     def _compute_potential(
         self,
-        mask:   "pd.Series[bool]",
+        mask: "pd.Series[bool]",
         lu_idx: int,
-        spec:   LogisticRegressionSpec,
+        spec: LogisticRegressionSpec,
     ) -> None:
         """
         Calcula _reg e _pot para um uso do solo em uma região.

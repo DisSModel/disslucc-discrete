@@ -9,10 +9,10 @@ A alocação ajusta iterativamente um vetor de correção global por uso
 até que a diferença entre demanda e área alocada esteja dentro de
 `max_difference`.
 """
+
 from __future__ import annotations
 
 import numpy as np
-
 from dissmodel.geo import SyncSpatialModel
 
 
@@ -62,21 +62,21 @@ class AllocationDClueSLike(SyncSpatialModel):
     def setup(
         self,
         demand,
-        land_use_types:    list[str],
+        land_use_types: list[str],
         transition_matrix: list[list[list[int]]],
-        cell_area:         float = 1.0,
-        max_difference:    float = 10.0,
-        max_iteration:     int   = 2000,
-        factor_iteration:  float = 0.0001,
-        region_attr:       str   = "region",
+        cell_area: float = 1.0,
+        max_difference: float = 10.0,
+        max_iteration: int = 2000,
+        factor_iteration: float = 0.0001,
+        region_attr: str = "region",
     ) -> None:
-        self.demand            = demand
-        self.land_use_types    = land_use_types
-        self.cell_area         = cell_area
-        self.max_difference    = max_difference
-        self.max_iteration     = max_iteration
-        self.factor_iteration  = factor_iteration
-        self.region_attr       = region_attr
+        self.demand = demand
+        self.land_use_types = land_use_types
+        self.cell_area = cell_area
+        self.max_difference = max_difference
+        self.max_iteration = max_iteration
+        self.factor_iteration = factor_iteration
+        self.region_attr = region_attr
 
         # Pre-compila a transition_matrix como array NumPy:
         # shape (n_regions, n_lu, n_lu) — acesso O(1) no inner loop
@@ -93,7 +93,7 @@ class AllocationDClueSLike(SyncSpatialModel):
         Equivale ao bloco while do AllocationDClueSLike.run() no Lua.
         """
         lu_types = self.land_use_types
-        n_lu     = len(lu_types)
+        n_lu = len(lu_types)
 
         # Regiões por célula (0-based para indexação do numpy)
         regions = self.gdf[self.region_attr].values.astype(int) - 1
@@ -103,8 +103,8 @@ class AllocationDClueSLike(SyncSpatialModel):
         # permitindo que o algoritmo oscile entre usos permitidos durante
         # a busca pelo equilíbrio (convergência).
         lu_matrix_start = np.column_stack([self.gdf[lu].values for lu in lu_types])
-        initial_lu_idx  = np.argmax(lu_matrix_start, axis=1)  # (n_cells,)
-        allowed         = self._tm[regions, initial_lu_idx, :]  # (n_cells, n_lu)
+        initial_lu_idx = np.argmax(lu_matrix_start, axis=1)  # (n_cells,)
+        allowed = self._tm[regions, initial_lu_idx, :]  # (n_cells, n_lu)
 
         # Tau por célula e uso: (n_cells, n_lu)
         # Coluna tau_{lu} é opcional — padrão = 0 (sem atração/repulsão)
@@ -121,20 +121,20 @@ class AllocationDClueSLike(SyncSpatialModel):
 
             # ── 1. Escore por célula e uso ────────────────────────────────
             # score = (1 + tau) × pot + iter_vec
-            pot    = np.column_stack([self.gdf[lu + "_pot"].values for lu in lu_types])
+            pot = np.column_stack([self.gdf[lu + "_pot"].values for lu in lu_types])
             scores = (1.0 + tau) * pot + iter_vec[np.newaxis, :]
 
             # Transições proibidas recebem -inf para nunca vencer o argmax
             scores = np.where(allowed, scores, -np.inf)
 
             # ── 2. Melhor uso por célula ──────────────────────────────────
-            best_lu_idx = np.argmax(scores, axis=1)   # (n_cells,)
+            best_lu_idx = np.argmax(scores, axis=1)  # (n_cells,)
 
             for j, lu in enumerate(lu_types):
                 self.gdf[lu] = (best_lu_idx == j).astype(float)
 
             # ── 3. Verifica convergência ──────────────────────────────────
-            diff     = self._calc_diff()
+            diff = self._calc_diff()
             max_diff = float(np.max(np.abs(list(diff.values()))))
 
             if max_diff <= self.max_difference:

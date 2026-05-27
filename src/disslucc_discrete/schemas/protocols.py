@@ -3,7 +3,9 @@ disslucc.schemas.protocols
 --------------------------
 Protocolos que definem as interfaces entre os componentes.
 """
+
 from __future__ import annotations
+
 from typing import Protocol, runtime_checkable
 
 

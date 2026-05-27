@@ -19,6 +19,7 @@ def default_output_uri(experiment_id: str, ext: str) -> str:
         or './outputs/{id}/output.{ext}' if MinIO is not reachable.
     """
     from dissmodel.io._storage import get_default_client
+
     try:
         get_default_client()
         return f"s3://dissmodel-outputs/experiments/{experiment_id}/output.{ext}"
