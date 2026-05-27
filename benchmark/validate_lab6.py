@@ -156,11 +156,12 @@ def run_python(gdf: gpd.GeoDataFrame) -> tuple[gpd.GeoDataFrame, float, list[dic
         annual_demand=ANNUAL_DEMAND,
         land_use_types=LAND_USE_TYPES,
     )
-    potential = PotentialDLogisticRegression(
+    PotentialDLogisticRegression(
         gdf=gdf,
         potential_data=POTENTIAL_DATA,
         land_use_types=LAND_USE_TYPES,
     )
+
     AllocationDClueSLike(
         gdf=gdf,
         demand=demand,

@@ -8,10 +8,15 @@ Tradução de PotentialDLogisticRegression.lua (LuccME / TerraME).
 # fixed: updated import to disslucc_discrete.schemas.schemas
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
+
 import numpy as np
 from dissmodel.geo import SyncSpatialModel
 
 from disslucc_discrete.schemas.schemas import LogisticRegressionSpec
+
+if TYPE_CHECKING:
+    import pandas as pd
 
 
 class PotentialDLogisticRegression(SyncSpatialModel):

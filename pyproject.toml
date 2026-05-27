@@ -36,5 +36,7 @@ target-version = ['py39']
 [tool.ruff]
 line-length = 88
 target-version = "py39"
-select = ["E", "F", "I"] # pycodestyle, pyflakes, isort
-ignore = ["E701", "E241", "E203"] # allow some common spacing styles for math
+
+[tool.ruff.lint]
+select = ["E", "F", "I"]
+ignore = ["E701", "E241", "E203", "E501"] # ignore long lines (E501) as they are often okay in docs/strings

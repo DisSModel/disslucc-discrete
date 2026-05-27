@@ -170,7 +170,6 @@ class ClueSVectorExecutor(ModelExecutor):
             land_use_types=lu_types,
         )
 
-
         potential_specs = [
             LogisticRegressionSpec(
                 const=p["const"],
@@ -180,7 +179,7 @@ class ClueSVectorExecutor(ModelExecutor):
             for p in spec.get("potential", [])
         ]
 
-        potential = PotentialDLogisticRegression(
+        PotentialDLogisticRegression(
             gdf=gdf,
             potential_data=[potential_specs],
             land_use_types=lu_types,
