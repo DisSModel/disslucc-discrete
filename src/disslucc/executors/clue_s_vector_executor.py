@@ -211,6 +211,8 @@ class ClueSVectorExecutor(ModelExecutor):
             params.get("cell_area") or spec.get("cell_area", 1.0)
         )
         # ── environment + modelos ─────────────────────────────────────────
+        # Para executar 'n_steps' (ex: 6 passos de 0 a 5 inclusive),
+        # end_time deve ser igual a n_steps, pois o loop é while now < end_time
         env = Environment(end_time=n_steps)
 
         demand = DemandPreComputedValues(

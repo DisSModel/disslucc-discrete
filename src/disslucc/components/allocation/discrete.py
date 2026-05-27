@@ -66,7 +66,7 @@ class AllocationDClueSLike(SyncSpatialModel):
         transition_matrix: list[list[list[int]]],
         cell_area:         float = 1.0,
         max_difference:    float = 10.0,
-        max_iteration:     int   = 1000,
+        max_iteration:     int   = 2000,
         factor_iteration:  float = 0.0001,
         region_attr:       str   = "region",
     ) -> None:
@@ -98,6 +98,14 @@ class AllocationDClueSLike(SyncSpatialModel):
         # Regiões por célula (0-based para indexação do numpy)
         regions = self.gdf[self.region_attr].values.astype(int) - 1
 
+        # ── ESTADO INICIAL DO PASSO ───────────────────────────────────────
+        # A matriz de transição deve ser baseada no estado inicial do passo,
+        # permitindo que o algoritmo oscile entre usos permitidos durante
+        # a busca pelo equilíbrio (convergência).
+        lu_matrix_start = np.column_stack([self.gdf[lu].values for lu in lu_types])
+        initial_lu_idx  = np.argmax(lu_matrix_start, axis=1)  # (n_cells,)
+        allowed         = self._tm[regions, initial_lu_idx, :]  # (n_cells, n_lu)
+
         # Tau por célula e uso: (n_cells, n_lu)
         # Coluna tau_{lu} é opcional — padrão = 0 (sem atração/repulsão)
         tau = np.zeros((len(self.gdf), n_lu), dtype=float)
@@ -111,16 +119,7 @@ class AllocationDClueSLike(SyncSpatialModel):
 
         for n_iter in range(self.max_iteration + 1):
 
-            # ── 1. Uso corrente de cada célula ────────────────────────────
-            # argmax sobre as colunas binárias: retorna o índice do uso ativo
-            lu_matrix      = np.column_stack([self.gdf[lu].values for lu in lu_types])
-            current_lu_idx = np.argmax(lu_matrix, axis=1)   # shape (n_cells,)
-
-            # ── 2. Máscara de transições permitidas ───────────────────────
-            # tm[região, from_lu, :] → linha de 0/1 para cada to_lu
-            allowed = self._tm[regions, current_lu_idx, :]   # (n_cells, n_lu)
-
-            # ── 3. Escore por célula e uso ────────────────────────────────
+            # ── 1. Escore por célula e uso ────────────────────────────────
             # score = (1 + tau) × pot + iter_vec
             pot    = np.column_stack([self.gdf[lu + "_pot"].values for lu in lu_types])
             scores = (1.0 + tau) * pot + iter_vec[np.newaxis, :]
@@ -128,13 +127,13 @@ class AllocationDClueSLike(SyncSpatialModel):
             # Transições proibidas recebem -inf para nunca vencer o argmax
             scores = np.where(allowed, scores, -np.inf)
 
-            # ── 4. Melhor uso por célula ──────────────────────────────────
+            # ── 2. Melhor uso por célula ──────────────────────────────────
             best_lu_idx = np.argmax(scores, axis=1)   # (n_cells,)
 
             for j, lu in enumerate(lu_types):
                 self.gdf[lu] = (best_lu_idx == j).astype(float)
 
-            # ── 5. Verifica convergência ──────────────────────────────────
+            # ── 3. Verifica convergência ──────────────────────────────────
             diff     = self._calc_diff()
             max_diff = float(np.max(np.abs(list(diff.values()))))
 
@@ -148,7 +147,7 @@ class AllocationDClueSLike(SyncSpatialModel):
                     f"(erro máximo = {max_diff:.2f})"
                 )
 
-            # ── 6. Ajusta vetor de iteração ───────────────────────────────
+            # ── 4. Ajusta vetor de iteração ───────────────────────────────
             for j, lu in enumerate(lu_types):
                 iter_vec[j] += diff[lu] * self.factor_iteration
 

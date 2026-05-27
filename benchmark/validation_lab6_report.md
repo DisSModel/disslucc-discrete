@@ -6,7 +6,7 @@ Grid: cs_moju | Cells: 5914 | Steps: 6 (1999–2004)
 
 | ms/step |
 |---|
-| 60.3 |
+| 154.1 |
 
 ## Demand at final step (2004)
 
@@ -20,15 +20,15 @@ Grid: cs_moju | Cells: 5914 | Steps: 6 (1999–2004)
 
 | Metric | Value |
 |---|---|
-| Overall Accuracy | 99.0869% |
-| Cohen's κ        | 0.9301 |
+| Overall Accuracy | 100.0000% |
+| Cohen's κ        | 1.0000 |
 | Precision (d=1)  | 1.0000 |
-| Recall (d=1)     | 0.8778 |
-| F1 Score         | 0.9349 |
-| TP | 388 |
+| Recall (d=1)     | 1.0000 |
+| F1 Score         | 1.0000 |
+| TP | 442 |
 | TN | 5472 |
 | FP | 0 |
-| FN | 54 |
+| FN | 0 |
 | N (aligned) | 5914 |
 
 ## Notes

@@ -130,7 +130,7 @@ def discrete_metrics(pred: np.ndarray, ref: np.ndarray) -> dict:
 
 def run_python(gdf: gpd.GeoDataFrame) -> tuple[gpd.GeoDataFrame, float, list[dict]]:
     """Runs the Python simulation; returns (gdf, ms_per_step, step_log)."""
-    env = Environment(end_time=N_STEPS - 1)
+    env = Environment(end_time=N_STEPS)
 
     demand = DemandPreComputedValues(
         annual_demand  = ANNUAL_DEMAND,
@@ -199,10 +199,19 @@ def plot_map(gdf: gpd.GeoDataFrame, out: pathlib.Path) -> None:
     if "agree" not in gdf.columns:
         return
     fig, ax = plt.subplots(figsize=(8, 6))
-    gdf[gdf["agree"] == 1].plot(ax=ax, color="green",  markersize=1,
-                                 label=f"concorda ({(gdf['agree']==1).sum()})")
-    gdf[gdf["agree"] == 0].plot(ax=ax, color="red",    markersize=4,
-                                 label=f"discorda ({(gdf['agree']==0).sum()})")
+    
+    # Concordância
+    mask_agree = gdf["agree"] == 1
+    if mask_agree.any():
+        gdf[mask_agree].plot(ax=ax, color="green",  markersize=1,
+                             label=f"concorda ({mask_agree.sum()})")
+    
+    # Discordância (só plota se houver erros)
+    mask_disagree = gdf["agree"] == 0
+    if mask_disagree.any():
+        gdf[mask_disagree].plot(ax=ax, color="red",    markersize=4,
+                                 label=f"discorda ({mask_disagree.sum()})")
+    
     ax.set_title("Lab6 — concordância espacial d (2004)\nPython vs TerraME")
     ax.legend(loc="lower right", fontsize=8)
     ax.axis("off")
