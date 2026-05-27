@@ -1,4 +1,4 @@
-from .discrete import AllocationDClueSLike
+from .clue_s import AllocationDClueSLike
 
 __all__ = [
     "AllocationDClueSLike",

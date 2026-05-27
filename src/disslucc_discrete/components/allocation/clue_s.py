@@ -1,6 +1,6 @@
 """
-disslucc.components.allocation.discrete
------------------------------------------
+disslucc_discrete.components.allocation.clue_s
+----------------------------------------------
 Alocação discreta tipo CLUE-S (Verburg et al. 2002).
 Tradução de AllocationDClueSLike.lua (LuccME / TerraME).
 

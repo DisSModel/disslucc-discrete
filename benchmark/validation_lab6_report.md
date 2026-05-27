@@ -6,7 +6,7 @@ Grid: cs_moju | Cells: 5914 | Steps: 6 (1999–2004)
 
 | ms/step |
 |---|
-| 55.0 |
+| 65.3 |
 
 ## Demand at final step (2004)
 

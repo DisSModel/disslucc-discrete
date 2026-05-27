@@ -1,15 +1,15 @@
 """
-disslucc.components.potential.logistic
----------------------------------------
+disslucc_discrete.components.potential.logistic_regression
+---------------------------------------------------------
 Potencial por regressão logística — CLUE-S discreto.
 Tradução de PotentialDLogisticRegression.lua (LuccME / TerraME).
 """
-# fixed: updated import from disslucc.common.schemas to disslucc.schemas.schemas
+# fixed: updated import to disslucc_discrete.schemas.schemas
 from __future__ import annotations
 
 import numpy as np
 
-from disslucc.schemas.schemas import LogisticRegressionSpec
+from disslucc_discrete.schemas.schemas import LogisticRegressionSpec
 from dissmodel.geo import SyncSpatialModel
 
 

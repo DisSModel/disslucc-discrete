@@ -1,6 +1,6 @@
 """
-disslucc.demand.precomputed
---------------------------
+disslucc_discrete.demand.precomputed
+------------------------------------
 Pre-computed per-step demand — substrate-neutral (no GDF dependency).
 Compatible with DemandProtocol; works with both vector and raster substrates.
 """
@@ -18,40 +18,6 @@ def load_demand_csv(
 ) -> list[list[float]]:
     """
     Parse a demand CSV string into a list ready for DemandPreComputedValues.
-
-    Expected format — one column per land use type, one row per step:
-
-        f,d,outros
-        137878.17,19982.63,6489.20
-        137622.22,20238.58,6489.20
-        ...
-
-    Column order does not need to match land_use_types; mapping is done
-    by header name.
-
-    This function is pure parsing — no I/O. The caller is responsible for
-    reading the raw string from any source (local path, s3://, http://):
-
-        from dissmodel.io._utils import read_text
-        raw = read_text("s3://bucket/demand.csv")
-        demand = load_demand_csv(raw, ["f", "d", "outros"])
-
-    Parameters
-    ----------
-    raw : str
-        CSV content as a string.
-    land_use_types : list[str]
-        Land use names in the order the demand values should be returned.
-
-    Returns
-    -------
-    list[list[float]]
-        [step][land_use] in land_use_types order.
-
-    Raises
-    ------
-    ValueError
-        If any land use type is missing from the CSV header.
     """
     reader  = csv.DictReader(io.StringIO(raw))
     missing = [lu for lu in land_use_types if lu not in reader.fieldnames]
@@ -81,9 +47,9 @@ class DemandPreComputedValues(Model):
     Example
     -------
     from dissmodel.io._utils import read_text
-    from disslucc import load_demand_csv, DemandPreComputedValues
+    from disslucc_discrete import load_demand_csv, DemandPreComputedValues
 
-    raw    = read_text("s3://bucket/demand.csv")   # caller resolves URI
+    raw    = read_text("s3://bucket/demand.csv")
     demand = DemandPreComputedValues(
         annual_demand  = load_demand_csv(raw, ["f", "d", "outros"]),
         land_use_types = ["f", "d", "outros"],

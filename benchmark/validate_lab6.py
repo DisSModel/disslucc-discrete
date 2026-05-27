@@ -47,10 +47,10 @@ import matplotlib.pyplot as plt
 
 from dissmodel.core import Environment
 
-from disslucc.components.demand.precomputed  import DemandPreComputedValues
-from disslucc.components.potential.logistic  import PotentialDLogisticRegression
-from disslucc.components.allocation.discrete import AllocationDClueSLike
-from disslucc.schemas.schemas                import LogisticRegressionSpec
+from disslucc_discrete.components.demand.precomputed  import DemandPreComputedValues
+from disslucc_discrete.components.potential.logistic_regression  import PotentialDLogisticRegression
+from disslucc_discrete.components.allocation.clue_s import AllocationDClueSLike
+from disslucc_discrete.schemas.schemas                import LogisticRegressionSpec
 
 # ── model configuration — mirrors lab6_submodel.lua exactly ──────────────────
 
