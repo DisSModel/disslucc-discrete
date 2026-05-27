@@ -27,4 +27,4 @@ dev = [
 ]
 
 [project.entry-points."dissmodel.executors"]
-clue_s_vector = "disslucc.executors.clue_s_vector_executor:ClueSVectorExecutor"
+clue_s_vector = "disslucc_discrete.executors.clue_s_vector_executor:ClueSVectorExecutor"

@@ -47,10 +47,10 @@ import matplotlib.pyplot as plt
 
 from dissmodel.core import Environment
 
-from disslucc.components.demand.precomputed  import DemandPreComputedValues
-from disslucc.components.potential.logistic  import PotentialDLogisticRegression
-from disslucc.components.allocation.discrete import AllocationDClueSLike
-from disslucc.schemas.schemas                import LogisticRegressionSpec
+from disslucc_discrete.components.demand.precomputed  import DemandPreComputedValues
+from disslucc_discrete.components.potential.logistic_regression  import PotentialDLogisticRegression
+from disslucc_discrete.components.allocation.clue_s import AllocationDClueSLike
+from disslucc_discrete.schemas.schemas                import LogisticRegressionSpec
 
 # ── model configuration — mirrors lab6_submodel.lua exactly ──────────────────
 
@@ -200,20 +200,29 @@ def plot_map(gdf: gpd.GeoDataFrame, out: pathlib.Path) -> None:
         return
     fig, ax = plt.subplots(figsize=(8, 6))
     
+    import matplotlib.lines as mlines
+    handles = []
+    labels = []
+
     # Concordância
     mask_agree = gdf["agree"] == 1
     if mask_agree.any():
-        gdf[mask_agree].plot(ax=ax, color="green",  markersize=1,
-                             label=f"concorda ({mask_agree.sum()})")
+        gdf[mask_agree].plot(ax=ax, color="green",  markersize=1)
+        handles.append(mlines.Line2D([], [], color='green', marker='o', 
+                                     linestyle='None', markersize=5))
+        labels.append(f"concorda ({mask_agree.sum()})")
     
     # Discordância (só plota se houver erros)
     mask_disagree = gdf["agree"] == 0
     if mask_disagree.any():
-        gdf[mask_disagree].plot(ax=ax, color="red",    markersize=4,
-                                 label=f"discorda ({mask_disagree.sum()})")
+        gdf[mask_disagree].plot(ax=ax, color="red",    markersize=4)
+        handles.append(mlines.Line2D([], [], color='red', marker='o', 
+                                     linestyle='None', markersize=8))
+        labels.append(f"discorda ({mask_disagree.sum()})")
     
     ax.set_title("Lab6 — concordância espacial d (2004)\nPython vs TerraME")
-    ax.legend(loc="lower right", fontsize=8)
+    if handles:
+        ax.legend(handles, labels, loc="lower right", fontsize=8)
     ax.axis("off")
     plt.tight_layout()
     plt.savefig(str(out), dpi=150)

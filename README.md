@@ -24,7 +24,7 @@ You can run a discrete LUCC simulation using the `ClueSVectorExecutor`. You will
 
 ```bash
 # Run the simulation using the CLI executor
-python src/disslucc/executors/clue_s_vector_executor.py run \
+python src/disslucc_discrete/executors/clue_s_vector_executor.py run \
   --input data/cs_moju.zip \
   --output outputs/resultado_moju.gpkg \
   --toml examples/moju_model.toml \
