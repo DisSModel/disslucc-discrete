@@ -8,3 +8,8 @@ dist/
 .venv
 outputs/
 examples/data/output/
+benchmark/lab6_python_2004.cpg
+benchmark/lab6_python_2004.dbf
+benchmark/lab6_python_2004.prj
+benchmark/lab6_python_2004.shp
+benchmark/lab6_python_2004.shx
