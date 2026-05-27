@@ -77,6 +77,42 @@ f,d,o
 ...
 ```
 
+### Using the Makefile facilitator
+
+You can also use the following shorthand:
+
+```bash
+# Run Moju simulation
+make run-moju
+
+# Format code
+make format
+
+# Run linting
+make lint
+```
+
+---
+
+## 📊 Validation
+
+The discrete implementation has been validated against the original **TerraME/LuccME (Lab6)** reference using the Moju dataset (1999–2004). The Python implementation achieves **100% numerical parity** at the cell level.
+
+| Metric | Value |
+|---|---|
+| **Accuracy** | 100.00% |
+| **Cohen's κ (Kappa)** | 1.0000 |
+| **F1 Score** | 1.0000 |
+| **Runtime** | ~65 ms/step |
+
+To run the parity benchmark:
+
+```bash
+make benchmark
+```
+
+Results (maps, scatter plots, and reports) are generated in `benchmark/results/`.
+
 ---
 
 ## 🧩 Core Components
