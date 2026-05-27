@@ -28,3 +28,15 @@ dev = [
 
 [project.entry-points."dissmodel.executors"]
 clue_s_vector = "disslucc_discrete.executors.clue_s_vector_executor:ClueSVectorExecutor"
+
+[tool.black]
+line-length = 88
+target-version = ['py39']
+
+[tool.ruff]
+line-length = 88
+target-version = "py39"
+
+[tool.ruff.lint]
+select = ["E", "F", "I"]
+ignore = ["E701", "E241", "E203", "E501"] # ignore long lines (E501) as they are often okay in docs/strings
