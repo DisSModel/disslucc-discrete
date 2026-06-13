@@ -7,10 +7,10 @@ name = "disslucc-discrete"
 version = "0.1.0"
 description = "Discrete spatial LUCC models for DisSModel — CLUE-S allocation with logistic regression potential"
 readme = "README.md"
-authors = [{ name = "Your Name", email = "your.email@ufma.br" }]
+authors = [{ name = "Sergio Souza Costa", email = "sergio@ufma.br" }]
 license = { text = "MIT" }
 dependencies = [
-    "dissmodel @ git+https://github.com/LambdaGeo/dissmodel.git@develop",
+    "dissmodel>=0.6.0,<0.7.0",
     "pandas>=1.5.0",
     "numpy>=1.23.0",
     "geopandas>=0.12.0",
@@ -27,7 +27,8 @@ dev = [
 ]
 
 [project.entry-points."dissmodel.executors"]
-clue_s_vector = "disslucc_discrete.executors.clue_s_vector_executor:ClueSVectorExecutor"
+clue_s_vector   = "disslucc_discrete.executors.clue_s_vector_executor:ClueSVectorExecutor"
+lucc_validation = "disslucc_discrete.executors.lucc_validation_executor:LuccValidationExecutor"
 
 [tool.black]
 line-length = 88

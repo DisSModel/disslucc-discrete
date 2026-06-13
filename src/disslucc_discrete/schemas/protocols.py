@@ -1,6 +1,6 @@
 """
-disslucc.schemas.protocols
---------------------------
+disslucc_discrete.schemas.protocols
+------------------------------------
 Protocolos que definem as interfaces entre os componentes.
 """
 

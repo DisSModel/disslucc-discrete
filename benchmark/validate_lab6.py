@@ -1,3 +1,9 @@
+# Superseded by disslucc_discrete.executors.lucc_validation_executor — kept for reference.
+# Canonical way to run the validation:
+#   python src/disslucc_discrete/executors/lucc_validation_executor.py run \
+#     --input data/cs_moju.zip --output outputs/validation \
+#     --param terrame_reference=benchmark/data/Lab6_2004.zip
+
 """
 validate_lab6.py
 ================
@@ -49,9 +55,9 @@ matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 from dissmodel.core import Environment
 
-from disslucc_discrete.components.allocation.clue_s import AllocationDClueSLike
+from disslucc_discrete.components.allocation.vector.clue_s import AllocationDClueSLike
 from disslucc_discrete.components.demand.precomputed import DemandPreComputedValues
-from disslucc_discrete.components.potential.logistic_regression import (
+from disslucc_discrete.components.potential.vector.logistic_regression import (
     PotentialDLogisticRegression,
 )
 from disslucc_discrete.schemas.schemas import LogisticRegressionSpec
@@ -150,7 +156,7 @@ def discrete_metrics(pred: np.ndarray, ref: np.ndarray) -> dict:
 
 def run_python(gdf: gpd.GeoDataFrame) -> tuple[gpd.GeoDataFrame, float, list[dict]]:
     """Runs the Python simulation; returns (gdf, ms_per_step, step_log)."""
-    env = Environment(end_time=N_STEPS)
+    env = Environment(end_time=N_STEPS - 1)  # inclusive end_time: runs steps 0..N_STEPS-1
 
     demand = DemandPreComputedValues(
         annual_demand=ANNUAL_DEMAND,

@@ -1,9 +1,8 @@
 from .protocols import DemandProtocol, PotentialProtocol
-from .schemas import AllocationSpec, LogisticRegressionSpec
+from .schemas import LogisticRegressionSpec
 
 __all__ = [
     "LogisticRegressionSpec",
-    "AllocationSpec",
     "DemandProtocol",
     "PotentialProtocol",
 ]

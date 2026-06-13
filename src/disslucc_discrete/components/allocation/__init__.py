@@ -1,4 +1,4 @@
-from .clue_s import AllocationDClueSLike
+from .vector.clue_s import AllocationDClueSLike
 
 __all__ = [
     "AllocationDClueSLike",

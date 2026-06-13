@@ -77,6 +77,20 @@ f,d,o
 ...
 ```
 
+### Running the Lab6 validation (TerraME parity check)
+
+To reproduce the 100% cell-level parity result against TerraME/LuccME:
+
+```bash
+python src/disslucc_discrete/executors/lucc_validation_executor.py run \
+  --input  data/cs_moju.zip \
+  --output outputs/validation \
+  --param  terrame_reference=benchmark/data/Lab6_2004.zip
+```
+
+Artifacts (report.md, scatter.png, map.png, lab6_python_2004.zip) are written
+to `outputs/validation/`.
+
 ### Using the Makefile facilitator
 
 You can also use the following shorthand:
@@ -90,6 +104,34 @@ make format
 
 # Run linting
 make lint
+```
+
+---
+
+## 🧪 Testing & Validation
+
+The primary validation strategy is cell-by-cell parity against the TerraME/LuccME
+reference implementation (Lab6, Moju dataset, 1999–2004). This test is automated
+and runs on every CI build.
+
+```bash
+pytest tests/ -v
+```
+
+The integration test in `tests/test_validation_lab6.py` instantiates
+`LuccValidationExecutor`, runs the simulation over `data/cs_moju.zip`, and asserts:
+
+| Metric | Expected |
+|---|---|
+| **Accuracy** | 100.00% |
+| **Cohen's κ (Kappa)** | 1.0000 |
+| **F1 Score** | 1.0000 |
+| **FP / FN** | 0 / 0 |
+
+To run only the integration test:
+
+```bash
+pytest tests/test_validation_lab6.py -v
 ```
 
 ---
