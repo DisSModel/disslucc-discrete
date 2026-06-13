@@ -19,14 +19,16 @@ def test_demand_direction_logic():
     )
     
     # Step 0
-    # Note: Environment starts at 0. Environment logic in run() updates env._now.
-    # In a unit test without env.run(), we manually update env._now for the model to see.
+    # env._now is set directly here because Environment has no public advance() method —
+    # the only public API is run(), which executes the full simulation. This is deliberate:
+    # the test isolates DemandPreComputedValues.execute() without running the full lifecycle.
+    # Candidate for a dissmodel issue: expose env.advance(n) to step the clock by n ticks.
     env._now = 0
     demand.execute()
     assert demand.get_current_lu_direction(0) == 0 # Static at start
     assert demand.get_current_lu_demand(0) == 100
     
-    # Step 1
+    # Step 1 — same reasoning as above: direct clock manipulation to isolate the unit.
     env._now = 1
     demand.execute()
     assert demand.get_current_lu_direction(0) == 1  # 'f' increased (100 -> 110)

@@ -1,3 +1,6 @@
+# TODO: duplicated across disslucc-discrete, disslucc-continuous and
+# brmangue-dissmodel. Should be promoted to dissmodel.executor.utils
+# (tracked separately).
 def default_output_uri(experiment_id: str, ext: str) -> str:
     """
     Returns an s3:// URI when MinIO is reachable, a local path otherwise.

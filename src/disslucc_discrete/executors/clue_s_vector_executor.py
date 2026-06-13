@@ -122,8 +122,8 @@ class ClueSVectorExecutor(ModelExecutor):
         from dissmodel.core import Environment
 
         from disslucc_discrete import DemandPreComputedValues, load_demand_csv
-        from disslucc_discrete.components.allocation.clue_s import AllocationDClueSLike
-        from disslucc_discrete.components.potential.logistic_regression import (
+        from disslucc_discrete.components.allocation.vector.clue_s import AllocationDClueSLike
+        from disslucc_discrete.components.potential.vector.logistic_regression import (
             PotentialDLogisticRegression,
         )
         from disslucc_discrete.schemas.schemas import LogisticRegressionSpec
@@ -163,7 +163,7 @@ class ClueSVectorExecutor(ModelExecutor):
         alloc_cfg = spec.get("allocation", {})
         cell_area = float(params.get("cell_area") or spec.get("cell_area", 1.0))
         # ── environment + modelos ─────────────────────────────────────────
-        env = Environment(end_time=n_steps)
+        env = Environment(end_time=n_steps - 1)  # inclusive end_time: runs steps 0..n_steps-1
 
         demand = DemandPreComputedValues(
             annual_demand=annual_demand,
