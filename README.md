@@ -1,10 +1,10 @@
 # DisSLUCC-Discrete 🌍
 
-> **Discrete Spatial Library for Land Use Change Modeling** — A Python implementation of discrete LUCC modeling components (CLUE-S like), built on top of [DissModel](https://github.com/LambdaGeo/dissmodel)
+> **Discrete Spatial Library for Land Use Change Modeling** — A Python implementation of discrete LUCC modeling components (CLUE-S like), built on top of [DisSModel](https://github.com/DisSModel/dissmodel)
 
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 [![Python](https://img.shields.io/badge/python-3.9+-blue.svg)](https://python.org)
-[![LambdaGeo](https://img.shields.io/badge/LambdaGeo-Research-green.svg)](https://github.com/LambdaGeo)
+[![LambdaGeo](https://img.shields.io/badge/LambdaGeo-Research-green.svg)](https://github.com/DisSModel)
 
 ---
 
@@ -13,6 +13,8 @@
 **DisSLUCC-Discrete** is a Python library that implements spatially explicit components for discrete Land Use and Cover Change (LUCC) modeling. It provides a CLUE-S like allocation algorithm with logistic regression for potential estimation.
 
 This package focuses on **discrete** land use change (one use per cell), following the philosophy described by **Verburg et al. (2002)**.
+
+> ℹ️ **Note**: "DisSModel" is spelled with a capital S in the middle, standing for **S**patial.
 
 ---
 
@@ -183,7 +185,7 @@ Spatially distributes changes.
 
 ## 🗂️ Executor Architecture
 
-DisSLUCC follows the DissModel `ModelExecutor` pattern.
+DisSLUCC follows the DisSModel `ModelExecutor` pattern.
 
 - `ClueSVectorExecutor`: Executor for discrete simulations on vector substrates (GeoDataFrame).
 
@@ -208,4 +210,4 @@ pip install -e .
 
 ## 📄 License
 
-Distributed under the **MIT License**. Developed by the **[LambdaGeo](https://github.com/LambdaGeo)** research group.
+Distributed under the **MIT License**. Developed by the **[LambdaGeo](https://lambdageo.github.io)** research group.
