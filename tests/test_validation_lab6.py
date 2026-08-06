@@ -41,9 +41,17 @@ def test_lab6_parity():
     assert m["accuracy"] == pytest.approx(100.0, abs=1e-4), (
         f"Expected accuracy=100%, got {m['accuracy']:.4f}%"
     )
-    assert m["kappa"] == pytest.approx(1.0, abs=1e-4), (
-        f"Expected kappa=1.0, got {m['kappa']:.4f}"
+    # Pontius & Millones (2011) — replaces kappa as the parity criterion.
+    assert m["quantity_disagreement"] == pytest.approx(0.0, abs=1e-9), (
+        f"Quantity disagreement={m['quantity_disagreement']:.6f}, expected 0"
     )
+    assert m["allocation_disagreement"] == pytest.approx(0.0, abs=1e-9), (
+        f"Allocation disagreement={m['allocation_disagreement']:.6f}, expected 0"
+    )
+    # Identidade de Pontius: quantity + allocation == 1 - accuracy
+    assert m["total_disagreement"] == pytest.approx(
+        1.0 - m["accuracy"] / 100, abs=1e-9
+    ), "Pontius identity violated — check _discrete_metrics"
     assert m["f1"] == pytest.approx(1.0, abs=1e-4), (
         f"Expected F1=1.0, got {m['f1']:.4f}"
     )

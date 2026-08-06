@@ -126,9 +126,14 @@ The integration test in `tests/test_validation_lab6.py` instantiates
 | Metric | Expected |
 |---|---|
 | **Accuracy** | 100.00% |
-| **Cohen's κ (Kappa)** | 1.0000 |
+| **Quantity disagreement** (Pontius & Millones, 2011) | 0.000000 |
+| **Allocation disagreement** (Pontius & Millones, 2011) | 0.000000 |
 | **F1 Score** | 1.0000 |
 | **FP / FN** | 0 / 0 |
+
+Cohen's κ is still computed for backward compatibility with older reports, but it
+is **deprecated** across the DisSModel ecosystem in favour of the Pontius &
+Millones quantity/allocation decomposition, and is no longer asserted.
 
 To run only the integration test:
 
@@ -145,9 +150,29 @@ The discrete implementation has been validated against the original **TerraME/Lu
 | Metric | Value |
 |---|---|
 | **Accuracy** | 100.00% |
-| **Cohen's κ (Kappa)** | 1.0000 |
+| **Quantity disagreement** | 0.000000 |
+| **Allocation disagreement** | 0.000000 |
 | **F1 Score** | 1.0000 |
 | **Runtime** | ~65 ms/step |
+
+> ### ⚠️ Discriminance caveat — read before citing this result
+>
+> The parity above is real and reproducible, but the Lab6 scenario is close to
+> **non-discriminative**. A trivial static ranking by `prob_d - prob_f` — with no
+> CLUE-S, no iteration, no time steps and no DisSModel at all — reproduces the same
+> TerraME output cell for cell (5914/5914).
+>
+> This happens because every covariate in Lab6 is static, the elasticity of `f` is
+> `0.0`, and `d` is irreversible, so the allocation collapses to a pure threshold on
+> a fixed quantity. The CLUE-S iterations merely search for that threshold.
+>
+> **What this benchmark actually validates:** that the logistic regression
+> coefficients were transcribed correctly from the Lua original. It does **not**
+> exercise the allocation loop, the transition matrix beyond irreversibility,
+> regional stratification, `tau`, or multi-step dynamics.
+>
+> See `benchmark/naive_baseline.py` and `tests/test_benchmark_discriminance.py`.
+> Please do not cite this result as evidence of CLUE-S algorithmic fidelity.
 
 To run the parity benchmark:
 
