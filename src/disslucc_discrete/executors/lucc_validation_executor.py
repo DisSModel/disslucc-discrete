@@ -128,7 +128,8 @@ class LuccValidationExecutor(ModelExecutor):
     Validation executor for the discrete CLUE-S model (Lab6, cs_moju, 1999–2004).
 
     Runs the Python simulation and compares results cell-by-cell against the
-    TerraME/LuccME reference shapefile, reporting accuracy, kappa, F1, and
+    TerraME/LuccME reference shapefile, reporting accuracy, the Pontius &
+    Millones (2011) quantity/allocation decomposition, F1, and
     a spatial agreement map.
     """
 
@@ -194,7 +195,8 @@ class LuccValidationExecutor(ModelExecutor):
             df_aligned["d_py"].values, df_aligned["d_terrame"].values
         )
         record.add_log(f"  Accuracy:  {m['accuracy']:.4f}%")
-        record.add_log(f"  kappa:     {m['kappa']:.4f}")
+        record.add_log(f"  Quantity disagreement:   {m['quantity_disagreement']:.6f}")
+        record.add_log(f"  Allocation disagreement: {m['allocation_disagreement']:.6f}")
         record.add_log(f"  F1:        {m['f1']:.4f}")
         record.add_log(
             f"  TP={m['tp']}  TN={m['tn']}  FP={m['fp']}  FN={m['fn']}"
@@ -330,7 +332,16 @@ def _run_python(
 
 
 def _discrete_metrics(pred: np.ndarray, ref: np.ndarray) -> dict:
-    """Confusion-matrix metrics for binary (0/1) outputs."""
+    """Confusion-matrix metrics for binary (0/1) outputs.
+
+    Includes the Pontius & Millones (2011) decomposition into quantity and
+    allocation disagreement, which replaces kappa as the ecosystem's primary
+    agreement metric.
+
+    Kappa is still computed for backward compatibility with older reports; it
+    is considered deprecated (see Pontius & Millones, 2011, "Death to Kappa")
+    and must not be used to judge parity.
+    """
     pred = (pred >= 0.5).astype(int)
     ref = (ref >= 0.5).astype(int)
     n = len(pred)
@@ -344,6 +355,15 @@ def _discrete_metrics(pred: np.ndarray, ref: np.ndarray) -> dict:
     prec = tp / (tp + fp) if (tp + fp) > 0 else float("nan")
     rec = tp / (tp + fn) if (tp + fn) > 0 else float("nan")
     f1 = 2 * prec * rec / (prec + rec) if (prec + rec) > 0 else float("nan")
+
+    # ── Pontius & Millones (2011) ─────────────────────────────────────────────
+    # Quantity disagreement: difference in the total proportion of each class.
+    # Allocation disagreement: error remaining once the quantities are matched.
+    # The identity  quantity + allocation == 1 - accuracy  holds.
+    quantity   = abs(fp - fn) / n
+    allocation = 2 * min(fp, fn) / n
+    disagreement = quantity + allocation
+
     return dict(
         n=n,
         accuracy=p0 * 100,
@@ -351,7 +371,10 @@ def _discrete_metrics(pred: np.ndarray, ref: np.ndarray) -> dict:
         tn=tn,
         fp=fp,
         fn=fn,
-        kappa=kappa,
+        quantity_disagreement=quantity,
+        allocation_disagreement=allocation,
+        total_disagreement=disagreement,
+        kappa=kappa,          # deprecated — kept for backward compatibility
         precision=prec,
         recall=rec,
         f1=f1,
@@ -397,7 +420,7 @@ def _make_scatter(df: pd.DataFrame, m: dict) -> io.BytesIO:
     ax.text(
         0.05,
         0.78,
-        f"acc={m['accuracy']:.2f}%  κ={m['kappa']:.4f}\n"
+        f"acc={m['accuracy']:.2f}%  Q={m['quantity_disagreement']:.4f}  A={m['allocation_disagreement']:.4f}\n"
         f"F1={m['f1']:.4f}  N={m['n']}\n"
         f"TP={m['tp']}  TN={m['tn']}  FP={m['fp']}  FN={m['fn']}",
         transform=ax.transAxes,
@@ -462,7 +485,9 @@ def _build_report(m: dict, ms: float, n_cells: int) -> str:
         "## Accuracy — `d` at step 5 (2004)\n\n",
         "| Metric | Value |\n|---|---|\n",
         f"| Overall Accuracy | {m['accuracy']:.4f}% |\n",
-        f"| Cohen's κ        | {m['kappa']:.4f} |\n",
+        f"| Quantity disagreement | {m['quantity_disagreement']:.6f} |\n",
+        f"| Allocation disagreement | {m['allocation_disagreement']:.6f} |\n",
+        f"| Total disagreement | {m['total_disagreement']:.6f} |\n",
         f"| Precision (d=1)  | {m['precision']:.4f} |\n",
         f"| Recall (d=1)     | {m['recall']:.4f} |\n",
         f"| F1 Score         | {m['f1']:.4f} |\n",
