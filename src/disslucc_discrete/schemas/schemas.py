@@ -3,7 +3,7 @@ disslucc_discrete.schemas
 -------------------------
 Dataclasses que definem os parâmetros de cada componente.
 
-Servem como contratos entre o usuário e os modelos — validação
+They act as contracts between the user and the models — validation
 acontece aqui, os modelos só consomem.
 """
 

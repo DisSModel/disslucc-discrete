@@ -2,14 +2,14 @@
 disslucc_discrete.executors.clue_s_vector_executor
 --------------------------------------------------
 Executor para simulações LUCC vetoriais discretas (CLUE-S / GeoDataFrame).
-Equivalente ao lab6_main.lua — funciona via CLI e API da plataforma.
+Equivalente ao lab15_main.lua — funciona via CLI e API da plataforma.
 
-Diferenças em relação ao LUCCVectorExecutor (CLUE contínuo)
+Differences from LUCCVectorExecutor (continuous CLUE)
 ------------------------------------------------------------
 - Usa PotentialDLogisticRegression  em vez de PotentialLinearRegression
 - Usa AllocationDClueSLike          em vez de AllocationClueLike
 - Células são binárias (0/1 por uso) em vez de contínuas [0, 1]
-- Demanda em contagem de células     em vez de área (quando cell_area = 1)
+- Demand as cell counts               instead of area (when cell_area = 1)
 - Sem complementar_lu / correctCellChange
 """
 
@@ -33,7 +33,7 @@ class ClueSVectorExecutor(ModelExecutor):
         Caminho para o GeoDataFrame de entrada (GeoPackage, Shapefile, etc.).
 
     record.parameters
-        n_steps    : int   — número de passos de tempo (default 6)
+        n_steps    : int   — number of time steps (default 6)
         cell_area  : float — área de cada célula nas unidades da demanda (default 1.0)
         demand_csv : str   — URI do CSV de demanda (opcional; tem prioridade sobre
                              annual_demand quando ambos estão presentes)
@@ -46,12 +46,12 @@ class ClueSVectorExecutor(ModelExecutor):
             Um dict por uso do solo (na ordem de land_use_types):
               { "const": float, "elasticity": float, "betas": {col: float} }
         transition_matrix : list[list[list[int]]]
-            [region_idx][from_lu][to_lu] ∈ {0, 1}. region_idx é 0-based.
+            [region_idx][from_lu][to_lu] in {0, 1}. region_idx is 0-based.
         allocation : dict
             { "max_difference": float, "max_iteration": int,
               "factor_iteration": float }
         annual_demand : list[list[float]]
-            [step][lu_idx] — usado quando demand_csv não está presente.
+            [step][lu_idx] — used when demand_csv is absent.
         region_attr : str   (optional, default "region")
         cell_area   : float (optional; sobreposto por parameters.cell_area)
     """
@@ -115,9 +115,9 @@ class ClueSVectorExecutor(ModelExecutor):
 
     def run(self, data: gpd.GeoDataFrame, record: ExperimentRecord) -> gpd.GeoDataFrame:
         """
-        Valida colunas e executa a simulação CLUE-S discreta.
+        Validate columns and run the discrete CLUE-S simulation.
 
-        `data` é o GeoDataFrame injetado pelo execute_lifecycle — sem I/O aqui.
+        `data` is the GeoDataFrame injected by execute_lifecycle — no I/O here.
         """
         from dissmodel.core import Environment
 
@@ -156,10 +156,10 @@ class ClueSVectorExecutor(ModelExecutor):
         if len(annual_demand) < n_steps:
             raise ValueError(
                 f"annual_demand tem {len(annual_demand)} entradas para "
-                f"{n_steps} passos de tempo."
+                f"{n_steps} time steps."
             )
 
-        # ── parâmetros de alocação ────────────────────────────────────────
+        # ── allocation parameters ─────────────────────────────────────────
         alloc_cfg = spec.get("allocation", {})
         cell_area = float(params.get("cell_area") or spec.get("cell_area", 1.0))
         # ── environment + modelos ─────────────────────────────────────────
@@ -211,8 +211,8 @@ class ClueSVectorExecutor(ModelExecutor):
             )
 
         record.add_log(
-            f"Iniciando simulação CLUE-S discreta: "
-            f"{n_steps} passos · {len(gdf)} células · {len(lu_types)} usos"
+            f"Starting discrete CLUE-S simulation: "
+            f"{n_steps} steps · {len(gdf)} cells · {len(lu_types)} land uses"
         )
         env.run()
 
@@ -221,7 +221,7 @@ class ClueSVectorExecutor(ModelExecutor):
 
             plt.show()
 
-        record.add_log("Simulação concluída.")
+        record.add_log("Simulation complete.")
         return gdf
 
     def save(

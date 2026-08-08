@@ -1,7 +1,7 @@
 """
 tests/test_benchmark_discriminance.py
 =====================================
-Measures the **discriminative power** of the Lab6 benchmark.
+Measures the **discriminative power** of the Lab15 benchmark.
 
 The question these tests answer is not "does the model reproduce TerraME?" but
 "can the benchmark tell a correct CLUE-S implementation from one that does not
@@ -14,7 +14,7 @@ Known state (2026-07-27)
 ------------------------
 The naive baseline — a static ranking by ``prob_d - prob_f``, with no CLUE-S, no
 iteration and no time steps — reproduces the TerraME output **exactly**, cell for
-cell, 5914/5914. The Lab6 scenario therefore validates only the transcription of
+cell, 5914/5914. The Lab15 scenario therefore validates only the transcription of
 the logistic regression coefficients, **not** the allocation algorithm.
 
 That is why ``test_benchmark_is_discriminative`` is marked as a strict xfail.
@@ -34,11 +34,11 @@ sys.path.insert(0, str(pathlib.Path(__file__).parent.parent))
 DATA_DIR = pathlib.Path(__file__).parent.parent / "data"
 BENCHMARK_DIR = pathlib.Path(__file__).parent.parent / "benchmark" / "data"
 INPUT_ZIP = DATA_DIR / "cs_moju.zip"
-TERRAME_ZIP = BENCHMARK_DIR / "Lab6_2004.zip"
+TERRAME_ZIP = BENCHMARK_DIR / "Lab15_2004.zip"
 
 skip_if_no_data = pytest.mark.skipif(
     not INPUT_ZIP.exists() or not TERRAME_ZIP.exists(),
-    reason="Lab6 data files not found",
+    reason="Lab15 data files not found",
 )
 
 
@@ -88,7 +88,7 @@ def test_naive_baseline_reproduces_terrame():
 @pytest.mark.xfail(
     strict=True,
     reason=(
-        "Known limitation: in the Lab6 scenario every covariate is static, the "
+        "Known limitation: in the Lab15 scenario every covariate is static, the "
         "elasticity of f is 0.0 and d is irreversible, so allocation collapses "
         "into a static threshold. The naive baseline ties with CLUE-S. Making "
         "the benchmark discriminative requires a scenario with a dynamic "

@@ -1,13 +1,12 @@
 """
 disslucc_discrete.components.allocation.clue_s
 ----------------------------------------------
-Alocação discreta tipo CLUE-S (Verburg et al. 2002).
-Tradução de AllocationDClueSLike.lua (LuccME / TerraME).
+Discrete CLUE-S-like allocation (Verburg et al. 2002).
+Translation of AllocationDClueSLike.lua (LuccME / TerraME).
 
-Cada célula possui exatamente um uso do solo (colunas binárias 0/1).
-A alocação ajusta iterativamente um vetor de correção global por uso
-até que a diferença entre demanda e área alocada esteja dentro de
-`max_difference`.
+Each cell holds exactly one land use (binary 0/1 columns). Allocation
+iteratively adjusts a global correction vector per land use until the
+difference between demand and allocated area falls within `max_difference`.
 """
 
 from __future__ import annotations
@@ -18,45 +17,45 @@ from dissmodel.geo import SyncSpatialModel
 
 class AllocationDClueSLike(SyncSpatialModel):
     """
-    Alocação discreta CLUE-S — competição célula a célula.
+    Discrete CLUE-S allocation — cell-by-cell competition.
 
-    Algoritmo (por passo de tempo)
+    Algorithm (per time step)
     --------------------------------
-    1. iter_vec[lu] = 0  para todo lu  (reinicializado a cada passo)
-    2. Para cada célula: best_lu = argmax { (1 + tau_lu) × pot_lu + iter_lu }
-       restrito às transições permitidas pela transition_matrix.
-    3. Calcula diff[lu] = demand[lu] − area_alocada[lu].
+    1. iter_vec[lu] = 0  for every lu  (reset at each step)
+    2. For each cell: best_lu = argmax { (1 + tau_lu) × pot_lu + iter_lu },
+       restricted to the transitions allowed by transition_matrix.
+    3. Compute diff[lu] = demand[lu] − allocated_area[lu].
     4. iter_vec[lu] += diff[lu] × factor_iteration.
-    5. Repete 2–4 até max(|diff[lu]|) ≤ max_difference ou n_iter ≥ max_iteration.
+    5. Repeat 2–4 until max(|diff[lu]|) <= max_difference or n_iter >= max_iteration.
 
     Parameters
     ----------
     demand : DemandProtocol
-        Componente de demanda. Deve expor get_current_lu_demand(i).
+        Demand component. Must expose get_current_lu_demand(i).
     land_use_types : list[str]
-        Nomes dos usos do solo na ordem das colunas binárias do GDF.
+        Land-use names, in the order of the GDF's binary columns.
     transition_matrix : list[list[list[int]]]
-        transition_matrix[region_idx][from_lu][to_lu] ∈ {0, 1}.
-        region_idx 0-based; valores 1 = transição permitida, 0 = proibida.
+        transition_matrix[region_idx][from_lu][to_lu] in {0, 1}.
+        region_idx is 0-based; 1 = transition allowed, 0 = forbidden.
     cell_area : float
-        Área de cada célula nas mesmas unidades da demanda.
-        Use 1.0 quando a demanda for expressa em número de células.
+        Area of each cell, in the same units as the demand.
+        Use 1.0 when demand is expressed as a number of cells.
     max_difference : float
-        Critério de parada: máxima diferença absoluta aceitável entre
-        demanda e área alocada (nas unidades de cell_area × n_células).
+        Stopping criterion: largest acceptable absolute difference between
+        demand and allocated area (in units of cell_area × n_cells).
     max_iteration : int
-        Limite de iterações do inner loop antes de lançar RuntimeError.
+        Inner-loop iteration limit before raising RuntimeError.
     factor_iteration : float
-        Taxa de ajuste do vetor de iteração. Equivale ao factorIteration
-        do Lua. Valores menores = convergência mais suave, mais lenta.
+        Adjustment rate of the iteration vector, equivalent to the Lua
+        factorIteration. Smaller values converge more smoothly but slower.
     region_attr : str
-        Coluna de região no GDF (default "region"). Criada como 1 se ausente.
+        Region column in the GDF (default "region"). Created as 1 if absent.
 
-    Tau columns (opcional)
+    Tau columns (optional)
     ----------------------
-    Se o GDF possuir colunas `tau_{lu}`, elas são usadas como fator de
-    atração/repulsão por célula (feature opcional do LuccME). Caso ausentes,
-    tau = 0 para todas as células (comportamento padrão do Lab6).
+    If the GDF has `tau_{lu}` columns, they are used as a per-cell
+    attraction/repulsion factor (an optional LuccME feature). If absent,
+    tau = 0 for every cell (the Lab15 default).
     """
 
     def setup(
@@ -89,17 +88,17 @@ class AllocationDClueSLike(SyncSpatialModel):
 
     def execute(self) -> None:
         """
-        Executa o inner loop CLUE-S para o passo de tempo corrente.
+        Run the CLUE-S inner loop for the current time step.
         Equivale ao bloco while do AllocationDClueSLike.run() no Lua.
         """
         lu_types = self.land_use_types
         n_lu = len(lu_types)
 
-        # Regiões por célula (0-based para indexação do numpy)
+        # Per-cell regions (0-based for numpy indexing)
         regions = self.gdf[self.region_attr].values.astype(int) - 1
 
         # ── ESTADO INICIAL DO PASSO ───────────────────────────────────────
-        # A matriz de transição deve ser baseada no estado inicial do passo,
+        # The transition matrix must be based on the state at the start of the step,
         # permitindo que o algoritmo oscile entre usos permitidos durante
         # a busca pelo equilíbrio (convergência).
         lu_matrix_start = np.column_stack([self.gdf[lu].values for lu in lu_types])
@@ -107,14 +106,14 @@ class AllocationDClueSLike(SyncSpatialModel):
         allowed = self._tm[regions, initial_lu_idx, :]  # (n_cells, n_lu)
 
         # Tau por célula e uso: (n_cells, n_lu)
-        # Coluna tau_{lu} é opcional — padrão = 0 (sem atração/repulsão)
+        # tau_{lu} column is optional — default 0 (no attraction/repulsion)
         tau = np.zeros((len(self.gdf), n_lu), dtype=float)
         for j, lu in enumerate(lu_types):
             col = f"tau_{lu}"
             if col in self.gdf.columns:
                 tau[:, j] = self.gdf[col].values
 
-        # Vetor de iteração — reinicializado a cada passo de tempo
+        # Iteration vector — reset at each time step
         iter_vec = np.zeros(n_lu, dtype=float)
 
         for n_iter in range(self.max_iteration + 1):
@@ -142,12 +141,12 @@ class AllocationDClueSLike(SyncSpatialModel):
 
             if n_iter >= self.max_iteration:
                 raise RuntimeError(
-                    f"Alocação não convergiu no passo {int(self.env.now())} "
-                    f"após {self.max_iteration} iterações "
-                    f"(erro máximo = {max_diff:.2f})"
+                    f"Allocation did not converge at step {int(self.env.now())} "
+                    f"after {self.max_iteration} iterations "
+                    f"(max error = {max_diff:.2f})"
                 )
 
-            # ── 4. Ajusta vetor de iteração ───────────────────────────────
+            # ── 4. Adjust iteration vector ────────────────────────────────
             for j, lu in enumerate(lu_types):
                 iter_vec[j] += diff[lu] * self.factor_iteration
 
