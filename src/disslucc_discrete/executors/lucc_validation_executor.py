@@ -1,7 +1,7 @@
 """
 disslucc_discrete.executors.lucc_validation_executor
 -----------------------------------------------------
-Validation executor for the discrete LUCC model (Lab6, cs_moju, 1999–2004).
+Validation executor for the discrete LUCC model (Lab15, cs_moju, 1999–2004).
 Compares the Python CLUE-S implementation cell-by-cell against the TerraME/LuccME
 reference output.
 
@@ -10,7 +10,7 @@ Input contract
   record.source.uri
       Path or URI to the input shapefile / zip (cs_moju.zip).
   record.parameters["terrame_reference"]
-      Path or URI to the TerraME output shapefile / zip (Lab6_2004.zip).
+      Path or URI to the TerraME output shapefile / zip (Lab15_2004.zip).
       The file must expose a column named "d_out" (or "d") per-cell.
 
 Output artifacts
@@ -18,14 +18,14 @@ Output artifacts
   report.md         — accuracy metrics in Markdown
   scatter.png       — scatter plot of Python d vs TerraME d_out
   map.png           — spatial agreement map (green = agree, red = disagree)
-  lab6_python_2004.zip — shapefile result (f, d, o, agree columns) packed as zip
+  lab15_python_2004.zip — shapefile result (f, d, o, agree columns) packed as zip
 
 Usage
 -----
     python src/disslucc_discrete/executors/lucc_validation_executor.py run \\
       --input  data/cs_moju.zip \\
       --output outputs/validation \\
-      --param  terrame_reference=benchmark/data/Lab6_2004.zip
+      --param  terrame_reference=benchmark/data/Lab15_2004.zip
 """
 
 from __future__ import annotations
@@ -58,7 +58,7 @@ from disslucc_discrete.components.potential.vector.logistic_regression import (
 )
 from disslucc_discrete.schemas.schemas import LogisticRegressionSpec
 
-# ── Lab6 model constants — mirrors lab6_submodel.lua exactly ─────────────────
+# ── Lab15 model constants — mirrors lab15_submodel.lua exactly ─────────────────
 
 LAND_USE_TYPES = ["f", "d", "o"]
 N_STEPS = 6  # 1999 … 2004 (step 0 = 1999)
@@ -125,7 +125,7 @@ TRANSITION_MATRIX = [[[1, 1, 0], [0, 1, 0], [0, 0, 1]]]
 
 class LuccValidationExecutor(ModelExecutor):
     """
-    Validation executor for the discrete CLUE-S model (Lab6, cs_moju, 1999–2004).
+    Validation executor for the discrete CLUE-S model (Lab15, cs_moju, 1999–2004).
 
     Runs the Python simulation and compares results cell-by-cell against the
     TerraME/LuccME reference shapefile, reporting accuracy, the Pontius &
@@ -264,7 +264,7 @@ class LuccValidationExecutor(ModelExecutor):
         # Shapefile: save to a temp directory, then zip and write as single artifact
         gdf = result["gdf"][["f", "d", "o", "agree", "geometry"]]
         with tempfile.TemporaryDirectory() as tmpdir:
-            shp_path = pathlib.Path(tmpdir) / "lab6_python_2004.shp"
+            shp_path = pathlib.Path(tmpdir) / "lab15_python_2004.shp"
             gdf.to_file(str(shp_path))
             zip_buf = io.BytesIO()
             with zipfile.ZipFile(zip_buf, "w", zipfile.ZIP_DEFLATED) as zf:
@@ -275,7 +275,7 @@ class LuccValidationExecutor(ModelExecutor):
             "result_shp",
             write_bytes(
                 zip_buf,
-                f"{base_uri}/lab6_python_2004.zip",
+                f"{base_uri}/lab15_python_2004.zip",
                 content_type="application/zip",
             ),
         )
@@ -416,7 +416,7 @@ def _make_scatter(df: pd.DataFrame, m: dict) -> io.BytesIO:
     ax.set_yticks([0, 1])
     ax.set_xlabel("TerraME d_out (2004)")
     ax.set_ylabel("Python d (2004)")
-    ax.set_title("Lab6 — d (deforestation) 2004\nPython vs TerraME")
+    ax.set_title("Lab15 — d (deforestation) 2004\nPython vs TerraME")
     ax.text(
         0.05,
         0.78,
@@ -456,7 +456,7 @@ def _make_map(gdf: gpd.GeoDataFrame) -> io.BytesIO:
         )
         labels.append(f"disagree ({mask_disagree.sum()})")
 
-    ax.set_title("Lab6 — spatial agreement d (2004)\nPython vs TerraME")
+    ax.set_title("Lab15 — spatial agreement d (2004)\nPython vs TerraME")
     if handles:
         ax.legend(handles, labels, loc="lower right", fontsize=8)
     ax.axis("off")
@@ -473,7 +473,7 @@ def _make_map(gdf: gpd.GeoDataFrame) -> io.BytesIO:
 
 def _build_report(m: dict, ms: float, n_cells: int) -> str:
     lines = [
-        "# Lab6 Validation Report — CLUE-S Discrete (Python vs TerraME)\n\n",
+        "# Lab15 Validation Report — CLUE-S Discrete (Python vs TerraME)\n\n",
         f"Grid: cs_moju | Cells: {n_cells} | Steps: {N_STEPS} (1999–2004)\n\n",
         "## Runtime\n\n",
         f"| ms/step |\n|---|\n| {ms:.1f} |\n\n",

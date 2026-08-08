@@ -2,7 +2,7 @@
 disslucc_discrete.components.potential.logistic_regression
 ---------------------------------------------------------
 Potencial por regressão logística — CLUE-S discreto.
-Tradução de PotentialDLogisticRegression.lua (LuccME / TerraME).
+Translation of PotentialDLogisticRegression.lua (LuccME / TerraME).
 """
 
 # fixed: updated import to disslucc_discrete.schemas.schemas
@@ -21,7 +21,7 @@ if TYPE_CHECKING:
 
 class PotentialDLogisticRegression(SyncSpatialModel):
     """
-    Potencial de transição por regressão logística (CLUE-S).
+    Transition potential via logistic regression (CLUE-S).
 
     Verburg et al. (2002). Para cada célula e cada uso do solo:
 
@@ -30,23 +30,23 @@ class PotentialDLogisticRegression(SyncSpatialModel):
         pot  = prob + elasticity × I(cell[lu] == 1)
 
     A elasticidade reforça o uso corrente da célula: quanto mais próxima
-    de 1, mais difícil é a transição para outro uso (lock-in espacial).
+    to 1, the harder the transition to another use (spatial lock-in).
 
     Parameters
     ----------
     potential_data : list[list[LogisticRegressionSpec]]
         potential_data[region_idx][lu_idx] — regiões × usos do solo.
-        region_idx é 0-based; a região 1 do modelo TOML é o índice 0.
+        region_idx is 0-based; region 1 in the TOML model is index 0.
     land_use_types : list[str]
         Nomes dos usos do solo na mesma ordem que potential_data[r].
     region_attr : str
         Nome da coluna de região no GeoDataFrame (default "region").
-        Se ausente, é criada com valor 1 (uma única região).
+        If absent, it is created with value 1 (a single region).
 
     Columns written
     ---------------
     {lu}_reg : float   — probabilidade logística bruta (sem elasticidade)
-    {lu}_pot : float   — probabilidade + elasticidade (usado pela alocação)
+    {lu}_pot : float   — probability + elasticity (used by allocation)
     """
 
     def setup(
@@ -94,18 +94,18 @@ class PotentialDLogisticRegression(SyncSpatialModel):
         """
         lu = self.land_use_types[lu_idx]
 
-        # Passo 1: combinação linear  z = const + Σ beta_k × x_k
+        # Step 1: linear combination  z = const + sum(beta_k * x_k)
         # Inicializa com const; multiplica por zero para herdar o índice do GDF.
         z = self.gdf.loc[mask, self.land_use_types[0]] * 0.0 + spec.const
         for col, beta in spec.betas.items():
             z = z + beta * self.gdf.loc[mask, col]
 
-        # Passo 2: transformação logística  prob = sigmoid(z)
-        # np.exp(-z) é numericamente mais estável que e^z / (1 + e^z)
+        # Step 2: logistic transformation  prob = sigmoid(z)
+        # np.exp(-z) is numerically more stable than e^z / (1 + e^z)
         # para z muito negativo, e idêntico a e^z/(1+e^z) para outros valores.
         prob = 1.0 / (1.0 + np.exp(-z))
 
-        # Passo 3: elasticidade para o uso corrente
+        # Step 3: elasticity for the current land use
         elas = np.where(self.gdf.loc[mask, lu] == 1, spec.elasticity, 0.0)
 
         self.gdf.loc[mask, lu + "_reg"] = prob

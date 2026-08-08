@@ -1,11 +1,17 @@
 """
-tests/test_validation_lab6.py
+tests/test_validation_lab15.py
 ------------------------------
 Integration test: verifies 100% cell-level parity between the Python CLUE-S
-implementation and the TerraME/LuccME reference (Lab6, cs_moju, 1999–2004).
+implementation and the TerraME/LuccME reference (Lab15, cs_moju, 1999–2004).
 
 Expected results (confirmed against TerraME log):
-  accuracy = 100.0%  kappa = 1.0  f1 = 1.0
+  accuracy = 100.0%  quantity disagreement = 0  allocation disagreement = 0
+
+Kappa is no longer asserted: it is deprecated across the ecosystem in favour of
+the Pontius & Millones (2011) decomposition. See also
+``tests/test_benchmark_discriminance.py`` — this scenario is reproduced by a
+trivial static ranking, so it validates coefficient transcription rather than the
+allocation algorithm.
 """
 import pathlib
 import pytest
@@ -13,14 +19,14 @@ import pytest
 DATA_DIR = pathlib.Path(__file__).parent.parent / "data"
 BENCHMARK_DIR = pathlib.Path(__file__).parent.parent / "benchmark" / "data"
 INPUT_ZIP = DATA_DIR / "cs_moju.zip"
-TERRAME_ZIP = BENCHMARK_DIR / "Lab6_2004.zip"
+TERRAME_ZIP = BENCHMARK_DIR / "Lab15_2004.zip"
 
 
 @pytest.mark.skipif(
     not INPUT_ZIP.exists() or not TERRAME_ZIP.exists(),
-    reason="Lab6 data files not found — skipping integration test",
+    reason="Lab15 data files not found — skipping integration test",
 )
-def test_lab6_parity():
+def test_lab15_parity():
     """Python CLUE-S must achieve 100% cell-level agreement with TerraME."""
     import geopandas as gpd
     from disslucc_discrete.executors.lucc_validation_executor import (

@@ -10,7 +10,7 @@ one, for claiming that CLUE-S was faithfully translated. If a trivial procedure
 parity, then the benchmark is not measuring the algorithm, but something far
 simpler.
 
-This module implements that trivial procedure for the Lab6 scenario.
+This module implements that trivial procedure for the Lab15 scenario.
 
 What the baseline does
 ----------------------
@@ -24,7 +24,7 @@ Nothing beyond:
 There is no CLUE-S, no iteration vector, no time steps, no transition matrix,
 no ``Environment``, and no DisSModel component of any kind.
 
-Why this works on Lab6
+Why this works on Lab15
 ----------------------
 The scenario collapses into a static threshold:
 
