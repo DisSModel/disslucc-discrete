@@ -79,7 +79,7 @@ f,d,o
 ...
 ```
 
-### Running the Lab6 validation (TerraME parity check)
+### Running the Lab15 validation (TerraME parity check)
 
 To reproduce the 100% cell-level parity result against TerraME/LuccME:
 
@@ -87,10 +87,10 @@ To reproduce the 100% cell-level parity result against TerraME/LuccME:
 python src/disslucc_discrete/executors/lucc_validation_executor.py run \
   --input  data/cs_moju.zip \
   --output outputs/validation \
-  --param  terrame_reference=benchmark/data/Lab6_2004.zip
+  --param  terrame_reference=benchmark/data/Lab15_2004.zip
 ```
 
-Artifacts (report.md, scatter.png, map.png, lab6_python_2004.zip) are written
+Artifacts (report.md, scatter.png, map.png, lab15_python_2004.zip) are written
 to `outputs/validation/`.
 
 ### Using the Makefile facilitator
@@ -113,14 +113,14 @@ make lint
 ## 🧪 Testing & Validation
 
 The primary validation strategy is cell-by-cell parity against the TerraME/LuccME
-reference implementation (Lab6, Moju dataset, 1999–2004). This test is automated
+reference implementation (Lab15, Moju dataset, 1999–2004). This test is automated
 and runs on every CI build.
 
 ```bash
 pytest tests/ -v
 ```
 
-The integration test in `tests/test_validation_lab6.py` instantiates
+The integration test in `tests/test_validation_lab15.py` instantiates
 `LuccValidationExecutor`, runs the simulation over `data/cs_moju.zip`, and asserts:
 
 | Metric | Expected |
@@ -138,14 +138,19 @@ Millones quantity/allocation decomposition, and is no longer asserted.
 To run only the integration test:
 
 ```bash
-pytest tests/test_validation_lab6.py -v
+pytest tests/test_validation_lab15.py -v
 ```
 
 ---
 
 ## 📊 Validation
 
-The discrete implementation has been validated against the original **TerraME/LuccME (Lab6)** reference using the Moju dataset (1999–2004). The Python implementation achieves **100% numerical parity** at the cell level.
+The discrete implementation has been validated against the **Lab15** case study of
+the reference LuccME implementation ([terrame/luccme](https://github.com/terrame/luccme),
+`tests/functional/lab15.lua`) using the Moju dataset (1999–2004): the same
+`DemandPreComputedValues` + `PotentialDLogisticRegression` + `AllocationDClueSLike`
+combination, the same demand trajectory, and the same regression coefficients. The
+Python implementation achieves **100% numerical parity** at the cell level.
 
 | Metric | Value |
 |---|---|
@@ -157,12 +162,12 @@ The discrete implementation has been validated against the original **TerraME/Lu
 
 > ### ⚠️ Discriminance caveat — read before citing this result
 >
-> The parity above is real and reproducible, but the Lab6 scenario is close to
+> The parity above is real and reproducible, but the Lab15 scenario is close to
 > **non-discriminative**. A trivial static ranking by `prob_d - prob_f` — with no
 > CLUE-S, no iteration, no time steps and no DisSModel at all — reproduces the same
 > TerraME output cell for cell (5914/5914).
 >
-> This happens because every covariate in Lab6 is static, the elasticity of `f` is
+> This happens because every covariate in Lab15 is static, the elasticity of `f` is
 > `0.0`, and `d` is irreversible, so the allocation collapses to a pure threshold on
 > a fixed quantity. The CLUE-S iterations merely search for that threshold.
 >
@@ -236,3 +241,9 @@ pip install -e .
 ## 📄 License
 
 Distributed under the **MIT License**. Developed by the **[LambdaGeo](https://lambdageo.github.io)** research group.
+
+---
+
+## 👥 Equipe PIBIC 2026
+
+- **Mateus Dutra Vale** - Plano 1: Implementação e Validação de Modelos LUCC no DisSModel 

@@ -2,12 +2,12 @@
 # Canonical way to run the validation:
 #   python src/disslucc_discrete/executors/lucc_validation_executor.py run \
 #     --input data/cs_moju.zip --output outputs/validation \
-#     --param terrame_reference=benchmark/data/Lab6_2004.zip
+#     --param terrame_reference=benchmark/data/Lab15_2004.zip
 
 """
-validate_lab6.py
+validate_lab15.py
 ================
-Validation of the discrete CLUE-S model (Lab6, cs_moju, 1999-2004)
+Validation of the discrete CLUE-S model (Lab15, cs_moju, 1999-2004)
 against the TerraME/LuccME reference output.
 
 Reference result (standalone NumPy, without dissmodel):
@@ -16,7 +16,7 @@ Reference result (standalone NumPy, without dissmodel):
   - Quantity disagreement = 0, allocation disagreement = 0 (Pontius & Millones, 2011)
 
 WARNING - DISCRIMINANCE CAVEAT
-    This parity is real, but the Lab6 scenario is close to non-discriminative:
+    This parity is real, but the Lab15 scenario is close to non-discriminative:
     a trivial static ranking by ``prob_d - prob_f``, with no CLUE-S, no
     iteration and no time steps, reproduces the same output cell for cell.
     In other words, this benchmark validates the transcription of the logistic
@@ -39,16 +39,16 @@ behaviour: iter_vec accumulates slowly until it overcomes the potential
 margin of the marginal cells (f->d).
 
 Usage:
-    python validate_lab6.py data/cs_moju.zip data/Lab6_2004.shp
+    python validate_lab15.py data/cs_moju.zip data/Lab15_2004.shp
 
-O shapefile do TerraME deve conter a coluna d_out gerada pelo lab6_main.lua
+O shapefile do TerraME deve conter a coluna d_out gerada pelo lab15_main.lua
 com saveAttrs = {"d_out"}.
 
 Saídas:
-    validation_lab6_report.md     — métricas textuais
-    validation_lab6_scatter.png   — scatter plot d_py vs d_terrame
-    validation_lab6_map.png       — mapa de concordância espacial
-    lab6_python_2004.shp          — shapefile resultado Python (f, d, o, agree)
+    validation_lab15_report.md     — métricas textuais
+    validation_lab15_scatter.png   — scatter plot d_py vs d_terrame
+    validation_lab15_map.png       — mapa de concordância espacial
+    lab15_python_2004.shp          — shapefile resultado Python (f, d, o, agree)
 """
 
 from __future__ import annotations
@@ -73,7 +73,7 @@ from disslucc_discrete.components.potential.vector.logistic_regression import (
 )
 from disslucc_discrete.schemas.schemas import LogisticRegressionSpec
 
-# ── model configuration — mirrors lab6_submodel.lua exactly ──────────────────
+# ── model configuration — mirrors lab15_submodel.lua exactly ──────────────────
 
 LAND_USE_TYPES = ["f", "d", "o"]
 N_STEPS = 6  # 1999 … 2004 (step 0 = 1999)
@@ -235,7 +235,7 @@ def plot_scatter(df: pd.DataFrame, m: dict, out: pathlib.Path) -> None:
     ax.set_yticks([0, 1])
     ax.set_xlabel("TerraME d_out (2004)")
     ax.set_ylabel("Python d (2004)")
-    ax.set_title("Lab6 — d (desmatamento) 2004\nPython vs TerraME")
+    ax.set_title("Lab15 — d (desmatamento) 2004\nPython vs TerraME")
     ax.text(
         0.05,
         0.78,
@@ -284,7 +284,7 @@ def plot_map(gdf: gpd.GeoDataFrame, out: pathlib.Path) -> None:
         )
         labels.append(f"discorda ({mask_disagree.sum()})")
 
-    ax.set_title("Lab6 — concordância espacial d (2004)\nPython vs TerraME")
+    ax.set_title("Lab15 — concordância espacial d (2004)\nPython vs TerraME")
     if handles:
         ax.legend(handles, labels, loc="lower right", fontsize=8)
     ax.axis("off")
@@ -295,7 +295,7 @@ def plot_map(gdf: gpd.GeoDataFrame, out: pathlib.Path) -> None:
 
 def write_report(m: dict, ms: float, n_total: int, out: pathlib.Path) -> None:
     lines = [
-        "# Lab6 Validation Report — CLUE-S Discrete (Python vs TerraME)\n\n",
+        "# Lab15 Validation Report — CLUE-S Discrete (Python vs TerraME)\n\n",
         f"Grid: cs_moju | Cells: {n_total} | Steps: {N_STEPS} (1999–2004)\n\n",
         "## Runtime\n\n",
         f"| ms/step |\n|---|\n| {ms:.1f} |\n\n",
@@ -333,30 +333,30 @@ def write_report(m: dict, ms: float, n_total: int, out: pathlib.Path) -> None:
 
 def main() -> None:
     parser = argparse.ArgumentParser(
-        description="Valida disslucc-discrete (Lab6) contra saída TerraME."
+        description="Valida disslucc-discrete (Lab15) contra saída TerraME."
     )
     parser.add_argument("cs_moju", help="cs_moju.shp ou cs_moju.zip")
-    parser.add_argument("terrame", help="Lab6_2004.shp gerado pelo TerraME")
-    parser.add_argument("--save-shp", default="benchmark/results/lab6_python_2004.shp")
+    parser.add_argument("terrame", help="Lab15_2004.shp gerado pelo TerraME")
+    parser.add_argument("--save-shp", default="benchmark/results/lab15_python_2004.shp")
     args = parser.parse_args()
 
     print("=" * 60)
-    print("Lab6 Validation: Python (disslucc-discrete) vs TerraME")
+    print("Lab15 Validation: Python (disslucc-discrete) vs TerraME")
     print("=" * 60)
 
     print("\n[1/3] Loading data...")
     gdf_input = load_shapefile(args.cs_moju)
     gdf_terrame = load_shapefile(args.terrame)
     ter_col = "d_out" if "d_out" in gdf_terrame.columns else "d"
-    print(f"  Entrada:  {len(gdf_input)} células  crs={gdf_input.crs}")
+    print(f"  Input:    {len(gdf_input)} cells  crs={gdf_input.crs}")
     print(
-        f"  TerraME:  {len(gdf_terrame)} células  d_out sum={gdf_terrame[ter_col].sum():.0f}"
+        f"  TerraME:  {len(gdf_terrame)} cells  d_out sum={gdf_terrame[ter_col].sum():.0f}"
     )
 
     # Sanity check
     total = gdf_input["f"] + gdf_input["d"] + gdf_input["o"]
     if not (np.abs(total - 1.0) < 1e-6).all():
-        print(f"  AVISO: {(np.abs(total-1.0)>=1e-6).sum()} células com f+d+o ≠ 1")
+        print(f"  WARNING: {(np.abs(total-1.0)>=1e-6).sum()} cells with f+d+o != 1")
 
     print("\n[2/3] Python simulation...")
     gdf_result, ms = run_python(gdf_input)
@@ -396,13 +396,13 @@ def main() -> None:
     results_dir = pathlib.Path("results")
     results_dir.mkdir(exist_ok=True, parents=True)
 
-    out_shp = results_dir / "lab6_python_2004.shp"
+    out_shp = results_dir / "lab15_python_2004.shp"
     gdf_result[["f", "d", "o", "agree", "geometry"]].to_file(str(out_shp))
     print(f"\nShapefile saved: {out_shp}")
 
-    plot_scatter(df_aligned, m, results_dir / "validation_lab6_scatter.png")
-    plot_map(gdf_result, results_dir / "validation_lab6_map.png")
-    write_report(m, ms, len(gdf_input), results_dir / "validation_lab6_report.md")
+    plot_scatter(df_aligned, m, results_dir / "validation_lab15_scatter.png")
+    plot_map(gdf_result, results_dir / "validation_lab15_map.png")
+    write_report(m, ms, len(gdf_input), results_dir / "validation_lab15_report.md")
 
     print("\n" + "=" * 60)
     print("SUMMARY")
