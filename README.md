@@ -241,3 +241,9 @@ pip install -e .
 ## 📄 License
 
 Distributed under the **MIT License**. Developed by the **[LambdaGeo](https://lambdageo.github.io)** research group.
+
+---
+
+## 👥 Equipe PIBIC 2026
+
+- **Mateus Dutra Vale** - Plano 1: Implementação e Validação de Modelos LUCC no DisSModel 
